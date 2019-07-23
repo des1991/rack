@@ -1,3 +1,5 @@
+require_relative 'time_formatter'
+
 class App
 
   def call(env)
@@ -13,7 +15,7 @@ class App
   private
 
   def not_found
-    [404, headers, ["Error Request!\n"]]
+    Rack::Response.new(["Error Request!\n"], 404, headers)
   end
 
   def headers
@@ -21,36 +23,12 @@ class App
   end
 
   def time
-    date = DateTime.now
+    date = TimeFormatter.new(DateTime.now, @request.params['format'])
 
-    @date_format = {
-      'year'   => date.year,
-      'month'  => date.month,
-      'day'    => date.day,
-      'hour'   => date.hour,
-      'minute' => date.minute,
-      'second' => date.second
-    }
-
-    @params = @request.params['format'].split(',')
-
-    if valid?
-      [200, headers, ["#{valid_params}\n"]]
+    if date.valid?
+      [200, headers, ["#{date.date_str}\n"]]
     else
-      [400, headers, ["Unknown time format #{invalid_params}\n"]]
+      [400, headers, ["Unknown time format #{date.invalid_formats}\n"]]
     end
   end
-
-  def valid?
-    @params.all? { |format| @date_format.has_key? format }
-  end
-
-  def valid_params
-    @params.map { |format| @date_format[format] }.join('-')
-  end
-
-  def invalid_params
-    @params.reject { |format| @date_format.has_key? format }
-  end
-
 end
