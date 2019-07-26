@@ -24,11 +24,12 @@ class App
 
   def time
     date = TimeFormatter.new(DateTime.now, @request.params['format'])
+    date.format
 
     if date.valid?
-      [200, headers, ["#{date.date_str}\n"]]
+      Rack::Response.new(["#{date.date_str}\n"], 200, headers)
     else
-      [400, headers, ["Unknown time format #{date.invalid_formats}\n"]]
+      Rack::Response.new(["Unknown time format #{date.invalid_formats}\n"], 400, headers)
     end
   end
 end

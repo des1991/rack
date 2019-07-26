@@ -2,18 +2,27 @@ class TimeFormatter
 
   DATE_TIME_FORMAT = %w[year month day hour minute second].freeze
 
-  attr_reader :date_str, :invalid_formats
-
   def initialize(date, format)
     @date = date
     @format_arr = format ? format.split(',') : []
     @valid_params = []
     @invalid_formats = []
+  end
+
+  def format
     start_formatter
-  end  
+  end
 
   def valid?
     @invalid_formats.empty?
+  end
+
+  def date_str
+    @date_str
+  end
+
+  def invalid_formats
+    @invalid_formats
   end
 
   private
